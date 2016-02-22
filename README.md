@@ -1,2 +1,2 @@
-# Machine_Learning_Project
-The goal of this repo is to publish the Cousera "Practical Machine Learning" course project 
+# Machine Learning Project
+The goal of this repo is to publish to the reviewers the Cousera "Practical Machine Learning" course project 
