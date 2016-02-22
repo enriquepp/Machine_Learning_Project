@@ -122,9 +122,16 @@ The best method is **Random Forest** without Cross Validation. The reason for th
 
 ```{r results, cache=TRUE}
 acc_rf$table
-acc_rf$overall
+acc_rf$overall[c(1,3:4)]
+
+testing$predRight <- pred_rf == testing$classe
+mf_rf$importance[order(mf_rf$importance, decreasing=TRUE),][1:3]
+qplot(roll_belt, yaw_belt, col=classe, data=testing, main="testing classes")
+qplot(roll_belt, yaw_belt, col=predRight, data=testing, main="Random Forest testing predictions")
+
 predV <- predict(mf_rf, validation)
 ```
 
-The **prediction** for the new data is: `r predV`  
+>The **prediction** for the new data is: **`r predV`**  
+  
   
