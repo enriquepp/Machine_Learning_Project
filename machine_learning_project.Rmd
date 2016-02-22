@@ -1,0 +1,130 @@
+---
+title: "Weight Lifting Exercises: predicting how well are done"
+author: "EPP"
+date: "February 23, 2016"
+output: html_document
+---
+
+##Executive summary
+Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).  
+Based on data from accelerometers on the belt, forearm, arm, and dumbell of the participants, the goal is determine the best method for predicting how well future exercises are done.  
+Several methods are tested and "random forest" gets the best accuracy.
+
+##Getting data  
+```{r get_data, cache=TRUE}
+setwd("~/R/Coursera/machlearn/project")
+data <- read.csv("pml-training.csv")
+validation <- read.csv("pml-testing.csv")
+```
+
+##Cleaning data  
+We can find 159 variables in the data. Some of them not related with classe, others classified as factors, and others with more than 90% of NAs values.  
+
+After:  
+
+* removing non metric variables as username, timestamps and windows;
+* converting factors to numbers;
+* removing variables with more than 50% of NAs;
+* removing near zero covariates;
+* for the rest of NAs, imputing medians (not necessary);
+
+there are 52 numeric variables left, all of them without NAs.  
+```{r clean, cache=TRUE}
+data <- data[,-c(1:7)]
+validation <- validation[,-c(1:7)]
+
+n <- ncol(data)-1
+colNA <- c()
+for (i in 1:n) {
+        if (is.factor(data[,i])) {data[,i] <- as.numeric(data[,i])}
+        if (sum(is.na(data[,i]))/length(data)>0.5) {colNA <- c(colNA, i)}
+        }
+for (i in 1:n) {if (is.factor(validation[,i])) {validation[,i] <- as.numeric(validation[,i])}}
+data <- data[,-colNA]
+validation <- validation[,-colNA]
+
+library(caret, warn.conflicts=FALSE, quietly=TRUE)
+nsv <- nearZeroVar(data, saveMetrics = FALSE)
+data <- data[,-nsv]
+validation <- validation[,-nsv]
+
+sum(apply(data, 2, function(i) {sum(is.na(i))}))
+sum(apply(validation, 2, function(i) {sum(is.na(i))}))
+```
+
+##Creating partitions  
+```{r partitions, cache=TRUE}
+set.seed(8888)
+inTrain = createDataPartition(data$classe, p = 0.7)[[1]]
+training = data[ inTrain,]
+testing = data[-inTrain,]
+```
+
+##Testing methods  
+We are going to test four different methods:  
+
+* random forest,
+* random forest with cross validation,
+* generalized boosted models,
+* generalized boosted models with cross validation,
+
+and then we will select the method with the minimum out-of-sample error (or the maximum accuracy).
+
+###Random Forest
+```{r random_forest, cache=TRUE}
+library(randomForest, warn.conflicts=FALSE, quietly=TRUE)
+set.seed(7777)
+mf_rf <- randomForest(classe~., data=training)
+pred_rf <- predict(mf_rf, testing)
+acc_rf <- confusionMatrix(testing$classe, pred_rf)
+acc_rf$overall
+```
+
+###Random Forest with Cross Validation
+```{r random_forest2, cache=TRUE}
+set.seed(7777)
+mf_rf2 <- train(classe~., data=training, method="rf", trControl=trainControl(method="cv", number=5))
+pred_rf2 <- predict(mf_rf2, testing)
+acc_rf2 <- confusionMatrix(testing$classe, pred_rf2)
+acc_rf2$overall
+```
+
+###Generalized Boosted Model
+```{r gbm, cache=TRUE}
+library(gbm, warn.conflicts=FALSE, quietly=TRUE)
+set.seed(7777)
+mf_gbm <- gbm(classe~., data=training, distribution="multinomial")
+pred_gbm <- predict(mf_gbm, testing, type="response", n.trees=100)
+p.pred_gbm <- apply(pred_gbm, 1, function(i) {dimnames(pred_gbm)[[2]][which.max(i)]})
+acc_gbm <- confusionMatrix(testing$classe, p.pred_gbm)
+acc_gbm$overall
+```
+
+###Generalized Boosted Model with Cross Validation
+```{r gbm2, cache=TRUE}
+set.seed(7777)
+mf_gbm2 <- gbm(classe~., data=training, cv.folds=5, distribution="multinomial")
+pred_gbm2 <- predict(mf_gbm2, testing, type="response")
+p.pred_gbm2 <- apply(pred_gbm2, 1, function(i) {dimnames(pred_gbm2)[[2]][which.max(i)]})
+acc_gbm2 <- confusionMatrix(testing$classe, p.pred_gbm2)
+acc_gbm2$overall
+```
+
+
+
+###Results  
+  
+**METHOD** | RF | RF+CV | GBM | GBM+CV
+----------- | ----------- | ----------- | ----------- | -----------
+**ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]` 
+
+The best method is **Random Forest** without Cross Validation. The reason for this result is that Random Forest doesn't need a cross validation resampling, and using it implies a smaller training dataset and none advantage.
+
+```{r results, cache=TRUE}
+acc_rf$table
+acc_rf$overall
+predV <- predict(mf_rf, validation)
+```
+
+The **prediction** for the new data is: `r predV`  
+  
