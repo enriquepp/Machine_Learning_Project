@@ -80,7 +80,7 @@ validation &lt;- read.csv(&quot;pml-testing.csv&quot;)</code></pre>
 </div>
 <div id="cleaning-data" class="section level2">
 <h2>Cleaning data</h2>
-<p>We can find 159 variables in the data. Some of them not related with classe, others classified as factors, and others with more than 90% of NAs values.</p>
+<p>We can find 159 variables in the data. Some of them not related with classe, others classified as factors but actually numbers, and others with more than 90% of NAs values. Only completed cases (rows without NAs) are considered by machine learning methods, so it is important to eliminate NAs.</p>
 <p>After:</p>
 <ul>
 <li>removing non metric variables as username, timestamps and windows;</li>
@@ -108,9 +108,9 @@ nsv &lt;- nearZeroVar(data, saveMetrics = FALSE)
 data &lt;- data[,-nsv]
 validation &lt;- validation[,-nsv]
 
-sum(apply(data, 2, function(i) {sum(is.na(i))}))</code></pre>
+sum(is.na(data))</code></pre>
 <pre><code>## [1] 0</code></pre>
-<pre class="r"><code>sum(apply(validation, 2, function(i) {sum(is.na(i))}))</code></pre>
+<pre class="r"><code>sum(is.na(validation))</code></pre>
 <pre><code>## [1] 0</code></pre>
 </div>
 <div id="creating-partitions" class="section level2">
@@ -215,7 +215,7 @@ acc_gbm2$overall</code></pre>
 </tr>
 </tbody>
 </table>
-<p>The best method is <strong>Random Forest</strong> without Cross Validation. The reason for this result is that Random Forest doesn’t need a cross validation resampling, and using it implies a smaller training dataset and none advantage.</p>
+<p>The best method is <strong>Random Forest</strong> without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset and none advantage.</p>
 <pre class="r"><code>acc_rf$table</code></pre>
 <pre><code>##           Reference
 ## Prediction    A    B    C    D    E
