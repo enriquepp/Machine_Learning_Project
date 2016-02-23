@@ -18,7 +18,7 @@ validation <- read.csv("pml-testing.csv")
 ```
 
 ##Cleaning data  
-We can find 159 variables in the data. Some of them not related with classe, others classified as factors, and others with more than 90% of NAs values.  
+We can find 159 variables in the data. Some of them not related with classe, others classified as factors but actually numbers, and others with more than 90% of NAs values. Only completed cases (rows without NAs) are considered by machine learning methods, so it is important to eliminate NAs.  
 
 After:  
 
@@ -29,7 +29,7 @@ After:
 * for the rest of NAs, imputing medians (not necessary);
 
 there are 52 numeric variables left, all of them without NAs.  
-```{r clean, cache=TRUE}
+```{r clean}
 data <- data[,-c(1:7)]
 validation <- validation[,-c(1:7)]
 
@@ -48,8 +48,8 @@ nsv <- nearZeroVar(data, saveMetrics = FALSE)
 data <- data[,-nsv]
 validation <- validation[,-nsv]
 
-sum(apply(data, 2, function(i) {sum(is.na(i))}))
-sum(apply(validation, 2, function(i) {sum(is.na(i))}))
+sum(is.na(data))
+sum(is.na(validation))
 ```
 
 ##Creating partitions  
@@ -118,7 +118,7 @@ acc_gbm2$overall
 ----------- | ----------- | ----------- | ----------- | -----------
 **ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]` 
 
-The best method is **Random Forest** without Cross Validation. The reason for this result is that Random Forest doesn't need a cross validation resampling, and using it implies a smaller training dataset and none advantage.
+The best method is **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset and none advantage.
 
 ```{r results, cache=TRUE}
 acc_rf$table
