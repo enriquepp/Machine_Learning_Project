@@ -29,7 +29,7 @@ After:
 * for the rest of NAs, imputing medians (not necessary);
 
 there are 52 numeric variables left, all of them without NAs.  
-```{r clean}
+```{r clean, cache=TRUE}
 data <- data[,-c(1:7)]
 validation <- validation[,-c(1:7)]
 
