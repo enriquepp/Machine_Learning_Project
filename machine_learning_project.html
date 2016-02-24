@@ -10,7 +10,7 @@
 
 <meta name="author" content="EPP" />
 
-<meta name="date" content="2016-02-23" />
+<meta name="date" content="2016-02-24" />
 
 <title>Weight Lifting Exercises: predicting how well are done</title>
 
@@ -64,7 +64,7 @@ img {
 <div id="header">
 <h1 class="title">Weight Lifting Exercises: predicting how well are done</h1>
 <h4 class="author"><em>EPP</em></h4>
-<h4 class="date"><em>February 23, 2016</em></h4>
+<h4 class="date"><em>February 24, 2016</em></h4>
 </div>
 
 
@@ -122,7 +122,7 @@ testing = data[-inTrain,]</code></pre>
 </div>
 <div id="testing-methods" class="section level2">
 <h2>Testing methods</h2>
-<p>We are going to test four different methods:</p>
+<p>We are going to test two different methods with and without cross validation:</p>
 <ul>
 <li>random forest,</li>
 <li>random forest with cross validation,</li>
@@ -130,12 +130,11 @@ testing = data[-inTrain,]</code></pre>
 <li>generalized boosted models with cross validation,</li>
 </ul>
 <p>and then we will select the method with the minimum out-of-sample error (or the maximum accuracy).</p>
+<p>The reason to select these methods is that random forest and boosting are the two top performing algorithms in prediction contests, and the accuracy of random forest.</p>
 <div id="random-forest" class="section level3">
 <h3>Random Forest</h3>
-<pre class="r"><code>library(randomForest, warn.conflicts=FALSE, quietly=TRUE)</code></pre>
-<pre><code>## randomForest 4.6-12
-## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre class="r"><code>set.seed(7777)
+<pre class="r"><code>library(randomForest, warn.conflicts=FALSE, quietly=TRUE)
+set.seed(7777)
 mf_rf &lt;- randomForest(classe~., data=training)
 pred_rf &lt;- predict(mf_rf, testing)
 acc_rf &lt;- confusionMatrix(testing$classe, pred_rf)
@@ -207,11 +206,18 @@ acc_gbm2$overall</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>ACCURACY</strong></td>
+<td align="left"><strong>TEST ACCURACY</strong></td>
 <td align="left">0.9964316</td>
 <td align="left">0.9942226</td>
 <td align="left">0.5124894</td>
 <td align="left">0.5128292</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>TEST ERROR</strong></td>
+<td align="left">0.0035684</td>
+<td align="left">0.0057774</td>
+<td align="left">0.4875106</td>
+<td align="left">0.4871708</td>
 </tr>
 </tbody>
 </table>

@@ -1,7 +1,7 @@
 ---
 title: "Weight Lifting Exercises: predicting how well are done"
 author: "EPP"
-date: "February 23, 2016"
+date: "February 24, 2016"
 output: html_document
 ---
 
@@ -61,14 +61,16 @@ testing = data[-inTrain,]
 ```
 
 ##Testing methods  
-We are going to test four different methods:  
+We are going to test two different methods with and without cross validation:  
 
 * random forest,
 * random forest with cross validation,
 * generalized boosted models,
 * generalized boosted models with cross validation,
 
-and then we will select the method with the minimum out-of-sample error (or the maximum accuracy).
+and then we will select the method with the minimum out-of-sample error (or the maximum accuracy).  
+
+The reason to select these methods is that random forest and boosting are the two top performing algorithms in prediction contests, and the accuracy of random forest.
 
 ###Random Forest
 ```{r random_forest, cache=TRUE}
@@ -116,7 +118,8 @@ acc_gbm2$overall
   
 **METHOD** | RF | RF+CV | GBM | GBM+CV
 ----------- | ----------- | ----------- | ----------- | -----------
-**ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]` 
+**TEST ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]`
+**TEST ERROR** | `r 1-acc_rf$overall[1]` | `r 1-acc_rf2$overall[1]` | `r 1-acc_gbm$overall[1]` | `r 1-acc_gbm2$overall[1]`
 
 The best method is **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset and none advantage.
 
