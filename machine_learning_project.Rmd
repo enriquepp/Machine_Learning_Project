@@ -18,7 +18,7 @@ validation <- read.csv("pml-testing.csv")
 ```
 
 ##Cleaning data  
-We can find 159 variables in the data. Some of them not related with classe, others classified as factors but actually numbers, and others with more than 90% of NAs values. Only completed cases (rows without NAs) are considered by machine learning methods, so it is important to eliminate NAs.  
+We can find 159 variables in the data. Some of them not related with classe, others classified as factors but actually numbers, and others with more than 90% of NAs values. Only completed cases (rows without NAs) are considered by machine learning methods, so it is important to eliminate NAs or reimpute them.  
 
 After:  
 
@@ -121,7 +121,7 @@ acc_gbm2$overall
 **TEST ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]`
 **TEST ERROR** | `r 1-acc_rf$overall[1]` | `r 1-acc_rf2$overall[1]` | `r 1-acc_gbm$overall[1]` | `r 1-acc_gbm2$overall[1]`
 
-The best method is **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset and none advantage.
+The best method results **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset.
 
 ```{r results, cache=TRUE}
 acc_rf$table
@@ -132,9 +132,11 @@ mf_rf$importance[order(mf_rf$importance, decreasing=TRUE),][1:3]
 qplot(roll_belt, yaw_belt, col=classe, data=testing, main="testing classes")
 qplot(roll_belt, yaw_belt, col=predRight, data=testing, main="Random Forest testing predictions")
 
+oob_rf <- 1-confusionMatrix(data$classe, predict(mf_rf, data))$overall[1]
 predV <- predict(mf_rf, validation)
 ```
 
+>The estimated **OOB error** for new data is the average of errors in training and test partitions, or the error for the total data: **`r oob_rf`**  
 >The **prediction** for the new data is: **`r predV`**  
   
   
