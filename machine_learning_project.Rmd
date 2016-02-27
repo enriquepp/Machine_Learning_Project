@@ -121,7 +121,7 @@ acc_gbm2$overall
 **TEST ACCURACY** | `r acc_rf$overall[1]` | `r acc_rf2$overall[1]` | `r acc_gbm$overall[1]` | `r acc_gbm2$overall[1]`
 **TEST ERROR** | `r 1-acc_rf$overall[1]` | `r 1-acc_rf2$overall[1]` | `r 1-acc_gbm$overall[1]` | `r 1-acc_gbm2$overall[1]`
 
-The best method results **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset.
+The best method is **Random Forest** without Cross Validation. The reason for this result is that in random forests there is no need for cross-validation or a separate test set to get an unbiased estimate of the test set error. It is estimated internally, and using cross-validation implies a smaller training dataset.
 
 ```{r results, cache=TRUE}
 acc_rf$table
